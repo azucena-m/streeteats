@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
-import AuthModal from './AuthModal'
 
 export default function Layout() {
     const [showLogin, setShowLogin] = useState(false)
@@ -14,23 +13,8 @@ export default function Layout() {
                 onRegisterClick={() => setShowRegister(true)}
             />
             <main style={{ flex: 1 }}>
-                <Outlet context={{ setShowLogin, setShowRegister }}/>
+                <Outlet context={{ setShowLogin, setShowRegister,showLogin, showRegister }}/>
             </main>
-
-            {showLogin && (
-                <AuthModal
-                    mode='login'
-                    onClose={() => setShowLogin(false)}
-                    onSwitch={() => { setShowLogin(false) ; setShowRegister(true) }}
-                />
-            )}
-            {showRegister && (
-                <AuthModal
-                    mode='register'
-                    onClose={() => setShowRegister(false)}
-                    onSwitch={() => {setShowRegister(false); setShowLogin(true)}}
-                />
-            )}
         </div>
     )
 }

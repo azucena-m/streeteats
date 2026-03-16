@@ -5,7 +5,7 @@ const overlayStyle = {
     position: 'fixed',
     inset: 0,
     background: 'rgba(15,14,13,0.6)',
-    zIndex: 200,
+    zIndex: 1000,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -19,7 +19,8 @@ const modalStyle = {
     padding: '2rem',
     width: '100%',
     maxWidth: '440px',
-    position: 'relative'
+    position: 'relative',
+    zIndex: 1001
 }
   
 const inputStyle = {
@@ -103,11 +104,11 @@ function LoginForm({ onClose, onSwitch }) {
             <div style={{ marginBottom: '0.85rem' }}>
                 <label style={{ fontSize: '0.82rem', fontWeight: '600' }}>Email</label>
                 <input 
-                    style={inputStyle}
+                    style={{ ...inputStyle, zIndex: 1002, position: 'relative' }}
                     type='email'
                     placeholder='you@example.com'
                     value={email}
-                    onChange={e => setEmail(e.tartet.value)}
+                    onChange={e => setEmail(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                 />
             </div>
