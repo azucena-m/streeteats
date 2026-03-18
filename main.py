@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from backend.core.database import engine
 from backend.models.models import Base
@@ -12,7 +13,17 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True}
 )
 
-security = HTTPBearer
+security = HTTPBearer()
+
+
+# CORSMiddleware tells your FastAPI server to include special headers in its responses that say "I allow requests from localhost:5173". The browser sees those headers and allows the request through
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(trucks.router)
 app.include_router(auth.router)

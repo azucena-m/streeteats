@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from backend.core.database import get_db
 from backend.models.models import FoodTruck, User
 from backend.schemas.schemas import FoodTruckCreate, FoodTruckUpdate, FoodTruckOut
@@ -9,9 +9,23 @@ from backend.core.dependencies import get_current_admin
 router = APIRouter(prefix="/api/trucks", tags=["trucks"])
 
 @router.get("", response_model=List[FoodTruckOut])
-def get_all_trucks(db: Session = Depends(get_db)):
-    trucks = db.query(FoodTruck).all() # SQLAlchemy equivalent of SELECT * FROM food_trucks
-    return trucks
+def get_all_trucks(
+    search: Optional[str]  = Query(None),
+    cuisine: Optional[str] = Query(None),
+    is_open: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+    ):
+    query = db.query(FoodTruck)
+
+    if search:
+        query = query.filter(FoodTruck.name.ilike(f'%{search}%'))
+    if cuisine:
+        query = query.filter(FoodTruck.cuisine.ilike(f'%{cuisine}%'))
+    if is_open is not None:
+        query = query.filter(FoodTruck.is_open == (1 if is_open else 0))
+
+    return query.all()
+    
 
 @router.get("/{truck_id}", response_model=FoodTruckOut)
 def get_truck(truck_id: int, db: Session = Depends(get_db)): #this is a FastAPI's dependency injection
