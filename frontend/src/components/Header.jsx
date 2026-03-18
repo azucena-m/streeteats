@@ -39,6 +39,16 @@ export default function Header({ onLoginClick, onRegisterClick }) {
                         }}>
                             @{user.username}
                         </span>
+
+                        {user.is_admin && (
+                            <a href="/admin" style={{
+                                color: '#f55d2c', fontSize: '0.85rem',
+                                fontWeight: '600', textDecoration: 'none'
+                            }}>
+                                Admin ↗
+                            </a>
+                        )}
+                        
                         <button
                             onClick={logout}
                             style={{

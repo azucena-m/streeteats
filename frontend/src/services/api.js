@@ -19,7 +19,7 @@ api.interceptors.request.use(config => {
 export const trucksAPI = {
     getAll: (params = {}) => api.get('/api/trucks', { params }),
     getOne: (id)          => api.get(`/api/trucks/${id}`),
-    create: (data)        => api.get('/api/trucks', data),
+    create: (data)        => api.post('/api/trucks', data),
     update: (id, data)    => api.put(`/api/trucks/${id}`, data),
     delete: (id)          => api.delete(`/api/trucks/${id}`),
 }
