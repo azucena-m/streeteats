@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 
-export default function Header({ onLoginClick, onRegisterClick }) {
+export default function Header({ onLoginClick, onRegisterClick, onFavoritesClick }) {
     const { user, logout } = useAuth()
 
     return (
@@ -48,7 +48,22 @@ export default function Header({ onLoginClick, onRegisterClick }) {
                                 Admin ↗
                             </a>
                         )}
-                        
+
+                        <button
+                            onClick={onFavoritesClick}
+                            style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            border: '1.5px solid rgba(255,255,255,0.2)',
+                            color: 'white',
+                            borderRadius: '6px',
+                            padding: '0.45rem 0.9rem',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem'
+                            }}
+                        >
+                            ❤️ Favorites
+                        </button>
+
                         <button
                             onClick={logout}
                             style={{

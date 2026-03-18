@@ -73,8 +73,17 @@ export default function AdminPage() {
     }
 
     return (
+        
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem' }}>
-
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '800' }}>Admin Dashboard</h1>
+                <a href="/" style={{
+                color: '#f55d2c', fontWeight: '600',
+                fontSize: '0.9rem', textDecoration: 'none'
+                }}>
+                    ← Back to Site
+                </a>
+            </div>
             {/* Stats */}
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                 <StatCard label='Total Trucks' value={trucks.length} />

@@ -13,8 +13,10 @@ export default function HomePage() {
     const [openOnly, setOpenOnly] = useState(false)
     const [cuisines, setCuisines] = useState([])
     const [selected, setSelected] = useState(null)
+    const [favorites, setFavorites] = useState(new Set())
 
     const { setShowLogin, setShowRegister, showLogin, showRegister } = useOutletContext()
+    const  { user } = useAuth()
 
     const loadTrucks = () => {
         const params = {}
@@ -44,6 +46,17 @@ export default function HomePage() {
     const handleSearch = (e) => {
         if (e.key === 'Enter') loadTrucks()
     }
+
+    // Load favorites when user logs in
+    useEffect(() => {
+        if (!user) { setFavorites(new Set()); return }
+            favoritesAPI.getAll()
+            .then(res => {
+            const ids = new Set(res.data.map(f => f.truck_id))
+            setFavorites(ids)
+            })
+            .catch(() => {})
+    }, [user])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 63px)' }}>
@@ -160,6 +173,7 @@ export default function HomePage() {
                     key={truck.id}
                     truck={truck}
                     isSelected={selected?.id === truck.id}
+                    isFav={favorites.has(truck.id)}
                     onClick={() => {
                         console.log('selected truck:', truck)
                         setSelected(truck)
@@ -186,13 +200,19 @@ export default function HomePage() {
             </div>
         </div>
 
-        {console.log('selected state:', selected)}
         {/* Truck detail panel */}
         {selected && (
             <TruckDetail
             truck={selected}
             onClose={() => setSelected(null)}
             onLoginRequired={() => setShowLogin(true)}
+            onFavChange={(id, isFav) => {
+                setFavorites(prev => {
+                    const next = new Set(prev)
+                    isFav ? next.add(id) : next.delete(id)
+                    return next
+                })
+            }}
             />
         )}
 
@@ -215,7 +235,7 @@ export default function HomePage() {
   )
 }
 
-function TruckCard({ truck, isSelected, onClick }) {
+function TruckCard({ truck, isSelected, isFav, onClick }) {
   return (
     <div
         onClick={onClick}
@@ -226,7 +246,8 @@ function TruckCard({ truck, isSelected, onClick }) {
             overflow: 'hidden',
             cursor: 'pointer',
             display: 'flex',
-            transition: 'border-color 0.15s'
+            transition: 'border-color 0.15s',
+            position: 'relative'
         }}
         >
         <div style={{
@@ -240,14 +261,17 @@ function TruckCard({ truck, isSelected, onClick }) {
         <div style={{ padding: '0.65rem', flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.4rem' }}>
             <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{truck.name}</span>
-            <span style={{
-                fontSize: '0.68rem', background: '#f2ede4',
-                border: '1px solid #e0d9ce', padding: '0.1rem 0.4rem',
-                borderRadius: '999px', fontWeight: '600',
-                color: '#8a8378', whiteSpace: 'nowrap'
-            }}>
-                {truck.cuisine}
-            </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                    {isFav && <span style={{ fontSize: '0.75rem' }}>❤️</span>}
+                    <span style={{
+                        fontSize: '0.68rem', background: '#f2ede4',
+                        border: '1px solid #e0d9ce', padding: '0.1rem 0.4rem',
+                        borderRadius: '999px', fontWeight: '600',
+                        color: '#8a8378', whiteSpace: 'nowrap'
+                    }}>
+                        {truck.cuisine}
+                    </span>
+                </div>
             </div>
             {truck.description && (
             <p style={{
@@ -281,7 +305,7 @@ function TruckCard({ truck, isSelected, onClick }) {
   )
 }
 
-function TruckDetail({ truck, onClose, onLoginRequired }) {
+function TruckDetail({ truck, onClose, onLoginRequired, onFavChange }) {
     const { user } = useAuth()
     const [isFav, setIsFav] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -303,9 +327,11 @@ function TruckDetail({ truck, onClose, onLoginRequired }) {
             if (isFav) {
                 await favoritesAPI.remove(truck.id)
                 setIsFav(false)
+                onFavChange(truck.id, false)
             } else {
                 await favoritesAPI.add(truck.id)
                 setIsFav(true)
+                onFavChange(truck.id, true)
             }
         } catch (e) {
             console.error(e)
